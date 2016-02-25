@@ -17,7 +17,17 @@ train0 = traindata(traindata.Resp==0, :);
 % make a subtable of patients who got better (Resp = 1)
 train1 = traindata(traindata.Resp==1, :);
 
+%% loading in test data
+testdata = readtable('test_data.csv', 'Delimiter', ',');
+size(testdata)
+summary(testdata)
 
+% 1st column = patient ID = number
+% 2nd column = response to treatment = H(?) = string
+% 3rd = protease sequence = string of C,G,T,A, etc
+% 4th = rt sequence = string
+% 5th = VL-t0 cell concentration = unit unclear
+% 6th = CD4-t0 cell concentration = unit unclear
 
 %% Visualize with histograms
 
@@ -51,5 +61,19 @@ legend('Dead','Alive');
 title('CD4-t0 Counts of HIV Patients after Treatment');
 xlabel('CD4-t0 Cell Concentration (unit unclear)');
 ylabel('# of Patients');
+
+%% bivariate (3D) histogram
+
+figure;
+hist3([cd0,vl0],[11,15],'FaceAlpha',0.65);
+xlabel('CD4-t0 cell count');
+ylabel('VL-t0 cell count');
+title('3D Histogram of Patients who died');
+figure;
+hist3([cd1,vl1],[11,15]);
+xlabel('CD4-t0 cell count');
+ylabel('VL-t0 cell count');
+title('3D Histogram of Patients who survived');
+
 
 
