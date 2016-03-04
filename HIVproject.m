@@ -75,5 +75,77 @@ xlabel('CD4-t0 cell count');
 ylabel('VL-t0 cell count');
 title('3D Histogram of Patients who survived');
 
+%% read in FASTA files using fastaread()
 
+pr0 = fastaread('pr0 protein aligned');
+pr1 = fastaread('pr1 protein aligned');
+rt0 = fastaread('rt0 protein aligned');
+rt1 = fastaread('rt1 protein aligned');
 
+% convert structure into table
+pr0 = struct2table(pr0);
+pr1 = struct2table(pr1);
+rt0 = struct2table(rt0);
+rt1 = struct2table(rt1);
+
+%% average amino acid sequence from pr1 protein aligned
+
+a = pr1(1,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+
+proteinbin = cell(187,length(c));
+
+for i = 1:187, % i equals number of rows in pr1
+a = pr1(i,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+    for j = 1:length(c),
+        proteinbin{i,j} = c(j);
+        if proteinbin{i,j} == '-', % replace - into a space
+            proteinbin{i,j} = char(0); % char(0) is a blank space
+        end;
+    end;
+end; % now protein bin has a protein amino acid in each cell
+
+averageseq_pr1=[];
+
+for i=1:99
+    temp = [proteinbin{:,i}];
+    averageseq_pr1 = [averageseq_pr1, char(mode(double(temp)))];
+end;
+
+% modesequence is an "average" sequence of amino acids that appear most
+% frequently at each site
+%% average amino acid sequence from pr0 protein aligned
+
+a = pr0(1,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+
+proteinbin = cell(733,length(c));
+
+for i = 1:733, % i equals number of rows in pr0
+a = pr0(i,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+    for j = 1:length(c),
+        proteinbin{i,j} = c(j);
+        if proteinbin{i,j} == '-', % replace - into a space
+            proteinbin{i,j} = char(0); % char(0) is a blank space
+        end;
+    end;
+end; % now protein bin has a protein amino acid in each cell
+
+averageseq_pr0=[];
+
+for i=1:99
+    temp = [proteinbin{:,i}];
+    averageseq_pr0 = [averageseq_pr0, char(mode(double(temp)))];
+end;
+
+%%
+mean(averageseq_pr1==averageseq_pr1)
+
+% every protein amino acid is same. we should try comparing nucleotide
+% sequences instead
