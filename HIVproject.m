@@ -73,6 +73,28 @@ figure;
 hist3([cd1,vl1],[11,15]);
 xlabel('CD4-t0 cell count');
 ylabel('VL-t0 cell count');
-title('3D Histogram of Patients who survived');
+title('3D Histogram of Patients who survived'); 
+%% 
 
-%% Hello 
+pr0 = struct2table(fastaread('pr0 protein aligned'));
+pr1 = struct2table(fastaread('pr1 protein aligned'));
+rt0 = struct2table(fastaread('rt0 protein aligned'));
+rt1 = struct2table(fastaread('rt1 protein aligned'));
+
+for i = 1:101
+    for j = 1:733
+        avgpr0 = mode(pr0{j,i})
+    end;
+end;
+
+%%
+for i = 1:101
+    % run LDA using classify
+    classify(test(X(:,i)),train training groups)
+    strncmp()
+    
+% look for the position of the amino acid that is most associated with death
+
+train0 = traindata(traindata.Resp==0, :);
+
+train1 = traindata(traindata.Resp==1, :);
