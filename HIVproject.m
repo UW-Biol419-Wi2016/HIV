@@ -77,18 +77,17 @@ title('3D Histogram of Patients who survived');
 
 %% read in FASTA files using fastaread()
 
-pr0 = fastaread('pr0 protein aligned');
-pr1 = fastaread('pr1 protein aligned');
-rt0 = fastaread('rt0 protein aligned');
-rt1 = fastaread('rt1 protein aligned');
+pr0 = fastaread('pr0 aligned');
+pr1 = fastaread('pr1 aligned');
+rt0 = fastaread('rt0 aligned');
+rt1 = fastaread('rt1 aligned');
 
 % convert structure into table
 pr0 = struct2table(pr0);
 pr1 = struct2table(pr1);
 rt0 = struct2table(rt0);
 rt1 = struct2table(rt1);
-
-%% average amino acid sequence from pr1 protein aligned
+%% average nucleotides from pr1 aligned
 
 a = pr1(1,2); % sequence cell with header
 b = a{1,1}; % sequence cell only
@@ -103,21 +102,21 @@ c = b{1}; % sequence string only
     for j = 1:length(c),
         proteinbin{i,j} = c(j);
         if proteinbin{i,j} == '-', % replace - into a space
-            proteinbin{i,j} = char(0); % char(0) is a blank space
+            proteinbin{i,j} = 0; % 
         end;
     end;
-end; % now protein bin has a protein amino acid in each cell
-
+end; % now protein bin has a nucleotide in each cell
+nucleotide_pr1 = proteinbin;
 averageseq_pr1=[];
 
-for i=1:99
+for i=1:297 % nucleotides 297 long
     temp = [proteinbin{:,i}];
     averageseq_pr1 = [averageseq_pr1, char(mode(double(temp)))];
 end;
 
-% modesequence is an "average" sequence of amino acids that appear most
+% modesequence is an "average" sequence of nucleotides that appear most
 % frequently at each site
-%% average amino acid sequence from pr0 protein aligned
+%% average amino acid sequence from pr0 aligned
 
 a = pr0(1,2); % sequence cell with header
 b = a{1,1}; % sequence cell only
@@ -132,20 +131,104 @@ c = b{1}; % sequence string only
     for j = 1:length(c),
         proteinbin{i,j} = c(j);
         if proteinbin{i,j} == '-', % replace - into a space
-            proteinbin{i,j} = char(0); % char(0) is a blank space
+            proteinbin{i,j} = 0; % 
         end;
     end;
-end; % now protein bin has a protein amino acid in each cell
-
+end; % now protein bin has a nucleotide in each cell
+nucleotide_pr0 = proteinbin;
 averageseq_pr0=[];
 
-for i=1:99
+for i=1:length(c) % 297 nucleotides long
     temp = [proteinbin{:,i}];
     averageseq_pr0 = [averageseq_pr0, char(mode(double(temp)))];
 end;
 
-%%
-mean(averageseq_pr1==averageseq_pr1)
+%% average nucleotide from rt0 aligned
 
-% every protein amino acid is same. we should try comparing nucleotide
-% sequences instead
+a = rt0(1,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+
+proteinbin = cell(794,length(c));
+
+for i = 1:794, % i equals number of rows in rt0
+a = rt0(i,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+    for j = 1:length(c),
+        proteinbin{i,j} = c(j);
+        if proteinbin{i,j} == '-', % replace - into a space
+            proteinbin{i,j} = 0; % blank space
+        end;
+    end;
+end; % now protein bin has a nucleotide in each cell
+nucleotide_rt0 = proteinbin;
+averageseq_rt0=[];
+
+for i=1:length(c) % 1482 nucleotides long at most
+    temp = [proteinbin{:,i}];
+    averageseq_rt0 = [averageseq_rt0, char(mode(double(temp)))];
+end;
+%% average nucleotide from rt1 aligned
+
+a = rt1(1,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+
+proteinbin = cell(187,length(c));
+
+for i = 1:187, % i equals number of rows in rt1
+a = rt1(i,2); % sequence cell with header
+b = a{1,1}; % sequence cell only
+c = b{1}; % sequence string only
+    for j = 1:length(c),
+        proteinbin{i,j} = c(j);
+        if proteinbin{i,j} == '-', % replace - into a space
+            proteinbin{i,j} = 0; % char(0) is a blank space
+        end;
+    end;
+end; % now protein bin has a nucleotide in each cell
+nucleotide_rt1 = proteinbin;
+averageseq_rt1=[];
+
+for i=1:length(c) %1476
+    temp = [proteinbin{:,i}];
+    averageseq_rt1 = [averageseq_rt1, char(mode(double(temp)))];
+end;
+%%
+mean(averageseq_pr0==averageseq_pr1)
+
+
+% mean(averageseq_rt0==averageseq_rt1)
+
+%% mutation table/cell
+
+for i = 1:length(averageseq_rt0)
+    avg_rt0(1,i)=cellstr(averageseq_rt0(i));
+end;
+
+iscellstr(averageseq_rt0(1,1)); % 0  no 
+iscellstr(nucleotide_rt0(1,1)); % 1  yes
+iscellstr(avg_rt0(1,1));        % 1  yes
+
+x = size(nucleotide_rt0);
+for i = 1:x(1)
+    for j = 1:x(2)
+        if strcmp(nucleotide_rt0(i,j), avg_rt0(1,j)) == 0
+            mutation_rt0{i,j} = nucleotide_rt0{i,j};
+        end;
+    end;
+end;
+
+%% 
+x = size(nucleotide_rt0);
+for i = 1:x(1)
+    for j = 1:x(2)
+        if mutation_rt0{i,j} == 0
+            mat_rt0(i,j) = 0;
+        else
+            mat_rt0(i,j) = 1;
+        end;
+    end;
+end;
+
