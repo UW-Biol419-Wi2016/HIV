@@ -49,7 +49,7 @@ hold on;
 histogram(vl1, 'FaceColor', 'b');
 legend('Dead','Alive');
 title('VL-t0 Counts of HIV Patients after Treatment');
-xlabel('VL-t0 Cell Concentration (unit unclear)');
+xlabel('VL-t0 Cell Concentration (per ml of blood)');
 ylabel('# of Patients');
 
 % need to edit and unify bins
@@ -59,7 +59,7 @@ hold on;
 histogram(cd1, 'FaceColor', 'b');
 legend('Dead','Alive');
 title('CD4-t0 Counts of HIV Patients after Treatment');
-xlabel('CD4-t0 Cell Concentration (unit unclear)');
+xlabel('CD4-t0 Cell Concentration (per ml of blood)');
 ylabel('# of Patients');
 
 %% bivariate (3D) histogram
@@ -102,7 +102,7 @@ c = b{1}; % sequence string only
     for j = 1:length(c),
         proteinbin{i,j} = c(j);
         if proteinbin{i,j} == '-', % replace - into a space
-            proteinbin{i,j} = 0; % 
+            proteinbin{i,j} = 0; % char(0) is a blank space
         end;
     end;
 end; % now protein bin has a nucleotide in each cell
@@ -112,11 +112,11 @@ averageseq_pr1=[];
 for i=1:297 % nucleotides 297 long
     temp = [proteinbin{:,i}];
     averageseq_pr1 = [averageseq_pr1, char(mode(double(temp)))];
-end;
+end; % 297 nucleotides long, same as averageseq_pr1
 
 % modesequence is an "average" sequence of nucleotides that appear most
 % frequently at each site
-%% average amino acid sequence from pr0 aligned
+%% average nucleotide sequence from pr0 aligned
 
 a = pr0(1,2); % sequence cell with header
 b = a{1,1}; % sequence cell only
@@ -140,8 +140,8 @@ averageseq_pr0=[];
 
 for i=1:length(c) % 297 nucleotides long
     temp = [proteinbin{:,i}];
-    averageseq_pr0 = [averageseq_pr0, char(mode(double(temp)))];
-end;
+    averageseq_pr0 = [averageseq_pr0, char(mode(double(temp)))]; 
+end; %297 nucleotides long, same as averageseq_pr1
 
 %% average nucleotide from rt0 aligned
 
