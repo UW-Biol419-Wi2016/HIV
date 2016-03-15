@@ -26,12 +26,17 @@ permuted = randperm(920);
 test = permuted(1:floor(920*test_frac)); 
 train = permuted(ceil((920*test_frac)):end);
 
-viral_class = fitcdiscr(score(train,:),train_response(train),'DiscrimType','pseudoQuadratic');
+viral_class = fitcdiscr(score(train,:),train_response(train),'DiscrimType','diaglinear');
 
 viral_predict = predict(viral_class,score(test,:));
 
-cv_quad = mean(viral_predict == train_response(test));
-cv_acc_quad(i)= cv_quad;
+cv_quad = horzcat(viral_predict, train_response(test));
+cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-viral_cv_acc_quad = mean(cv_acc_quad) % 0.7933
+viral_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[viral_cv_acc_quad, cv_0_acc, cv_1_acc]
+%  0.3152    0.1458    0.8750 when all scores used with pseudoquadratic
+%  0.3209    0.1458    0.9250 for pseudoquadratic
+%  0.7804    0.9781    0.0851 for diaglinear

@@ -121,7 +121,7 @@ rt_predict = predict(pr_nuc_class,score(test,1:299));
 cv_quad = mean(rt_predict == train_response(test));
 cv_acc_quad(i)= cv_quad;
 end
-
+cv_1_acc =sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1)
 pr_nuc_cv_acc_quad = mean(cv_acc_quad) % 0.7884
 
 %% 
@@ -140,7 +140,7 @@ rt_predict = predict(rt_nuc_class,score(test,1:905));
 cv_quad = mean(rt_predict == train_response(test));
 cv_acc_quad(i)= cv_quad;
 end
-
+cv_1_acc =sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1)
 rt_nuc_cv_acc_quad = mean(cv_acc_quad) % 0.2074
 
 

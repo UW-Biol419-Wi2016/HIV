@@ -26,8 +26,8 @@ summary(testdata)
 % 2nd column = response to treatment = H(?) = string
 % 3rd = protease sequence = string of C,G,T,A, etc
 % 4th = rt sequence = string
-% 5th = VL-t0 cell concentration = unit unclear
-% 6th = CD4-t0 cell concentration = unit unclear
+% 5th = VL-t0 cell concentration = per millimeter of blood
+% 6th = CD4-t0 cell concentration = per millimeter of blood
 
 %% Visualize with histograms
 
@@ -73,10 +73,8 @@ figure;
 hist3([cd1,vl1],[11,15]);
 xlabel('CD4-t0 cell count');
 ylabel('VL-t0 cell count');
-title('3D Histogram of Patients who survived'); 
-%% 
+title('3D Histogram of Patients who survived');
 
-<<<<<<< HEAD
 %% read in FASTA files using fastaread()
 
 pr0 = fastaread('pr0 aligned');
@@ -202,7 +200,7 @@ mean(averageseq_pr0==averageseq_pr1)
 
 
 % mean(averageseq_rt0==averageseq_rt1)
-
+% 1482 and 1476 long
 %% mutation table/cell
 
 for i = 1:length(averageseq_rt0)
@@ -231,27 +229,6 @@ for i = 1:x(1)
         else
             mat_rt0(i,j) = 1;
         end;
-=======
-pr0 = struct2table(fastaread('pr0 protein aligned'));
-pr1 = struct2table(fastaread('pr1 protein aligned'));
-rt0 = struct2table(fastaread('rt0 protein aligned'));
-rt1 = struct2table(fastaread('rt1 protein aligned'));
-
-for i = 1:101
-    for j = 1:733
-        avgpr0 = mode(pr0{j,i})
->>>>>>> origin/master
     end;
 end;
 
-%%
-for i = 1:101
-    % run LDA using classify
-    classify(test(X(:,i)),train training groups)
-    strncmp()
-    
-% look for the position of the amino acid that is most associated with death
-
-train0 = traindata(traindata.Resp==0, :);
-
-train1 = traindata(traindata.Resp==1, :);

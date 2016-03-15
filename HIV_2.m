@@ -210,7 +210,7 @@ pr_pca_mat = horzcat(VL_mat, CD_mat, pr_nuc_dev); % 920 by 299 matrix
 rt_pca_mat = horzcat(VL_mat, CD_mat, rt_nuc_dev); % 920 by 905 matrix
 %% pr nucleotide prediction
 [coeff, score, latent] = pca(pr_pca_mat);
-
+over200 = sum(pr_pca_mat)>200;
 for i=1:100
 test_frac = 0.2; % fraction of dataset to use for testing
 permuted = randperm(920); 
@@ -221,17 +221,19 @@ pr_nuc_classify = fitcdiscr(score(train,over200),train_response(train),'DiscrimT
 
 rt_predict = predict(pr_nuc_classify,score(test,over200));
 
-cv_quad = mean(rt_predict == train_response(test));
-cv_acc_quad(i)= cv_quad;
+cv_quad = horzcat(rt_predict, train_response(test));
+cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-pr_nuc_cv_acc_quad = mean(cv_acc_quad) 
+pr_nuc_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[pr_nuc_cv_acc_quad,cv_0_acc,cv_1_acc]
 % 0.7812 when 10 first scores used
 % 0.7271 when over200 18 scores used
 
 %% rt nucleotide prediction
 [coeff, score, latent] = pca(rt_pca_mat);
-over300 = rt_pca_mat > 300;
+over300 = sum(rt_pca_mat) > 300;
 % sum(over300)  16
 for i=1:100
 test_frac = 0.2; % fraction of dataset to use for testing
@@ -239,15 +241,17 @@ permuted = randperm(920);
 test = permuted(1:floor(920*test_frac)); 
 train = permuted(ceil((920*test_frac)):end);
 
-rt_nuc_classify = fitcdiscr(score(train,over300),train_response(train),'DiscrimType','pseudoQuadratic');
+rt_nuc_classify=fitcdiscr(score(train,over300),train_response(train),'DiscrimType','pseudoQuadratic');
 
 rt_predict = predict(rt_nuc_classify,score(test,over300));
 
-cv_quad = mean(rt_predict == train_response(test));
-cv_acc_quad(i)= cv_quad;
+cv_quad = horzcat(rt_predict, train_response(test));
+cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-rt_nuc_cv_acc_quad = mean(cv_acc_quad) 
+rt_nuc_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[rt_nuc_cv_acc_quad,cv_0_acc,cv_1_acc]
 % 0.7840 when first 10 scores used
 % 0.7752, 0.7753 when over300 16 scores used
 
@@ -297,16 +301,18 @@ train = permuted(ceil((920*test_frac)):end);
 
 pr_prot_classify = fitcdiscr(score(train,over250),train_response(train),'DiscrimType','pseudoQuadratic');
 
-rt_prot_predict = predict(pr_prot_classify,score(test,over250));
+pr_prot_predict = predict(pr_prot_classify,score(test,over250));
 
-cv_quad = mean(rt_prot_predict == train_response(test));
-cv_acc_quad(i)= cv_quad;
+cv_quad = horzcat(pr_prot_predict, train_response(test));
+cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-pr_prot_cv_acc_quad = mean(cv_acc_quad) 
+pr_prot_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[pr_prot_cv_acc_quad,cv_0_acc,cv_1_acc]
 % 0.75, 0.75 when all scores used
 % 0.77, 0.76 when over250 10 scores used
-
+% 4/42 = 0.0952 of gettings 1's
 %% rt protein prediction
 [coeff, score, latent] = pca(rt_prot_pca_mat);
 over300 = sum(rt_prot_pca_mat)>300;
@@ -321,13 +327,16 @@ rt_prot_classify = fitcdiscr(score(train,over300),train_response(train),'Discrim
 
 rt_prot_predict = predict(rt_prot_classify,score(test,over300));
 
-cv_quad = mean(rt_prot_predict == train_response(test));
-cv_acc_quad(i)= cv_quad;
+cv_quad = horzcat(rt_prot_predict, train_response(test));
+cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-rt_prot_cv_acc_quad = mean(cv_acc_quad) 
+rt_prot_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[rt_prot_cv_acc_quad,cv_0_acc,cv_1_acc]
 % 0.7855 w/ 10 scores, 0.31 w/ all
 % 0.7816 w/ over300 12 scores including viral loads 
+% 1/33
 %%  rt nucleotide deviation matrix only pca 
 [coeff, score, latent] = pca(rt_nuc_dev);
 over300 = sum(rt_nuc_dev)>300;
@@ -338,18 +347,21 @@ permuted = randperm(920);
 test = permuted(1:floor(920*test_frac)); 
 train = permuted(ceil((920*test_frac)):end);
 
-rt_nuc_classify2 = fitcdiscr(score(train,over300),train_response(train),'DiscrimType','pseudoQuadratic');
-
+rt_nuc_classify2 = fitcdiscr(score(train,over300),train_response(train),'DiscrimType','pseudoquadratic');
 rt_nuc_predict2 = predict(rt_nuc_classify2,score(test,over300));
 
 cv_quad = horzcat(rt_nuc_predict2, train_response(test));
 cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-rt_nuc_cv_acc_quad = mean(cv_acc_quad) 
+rt_nuc_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[rt_nuc_cv_acc_quad, cv_0_acc, cv_1_acc]
 % 0.2628 when all scores used
-% 0.7869, 0.7856 when over300 14 scores used
-
+% 0.7869, 0.7856, 0.7782 when over300 14 scores used (pseudoquadratic)
+% 0.8, 0.79  when over300, 14 scores, diaglinear
+% 0.7981  1.0000  0 when diaglinear
+% 1/29 = 0.0345 of gettings 1's correct
 %%  rt protein deviation matrix only pca 
 [coeff, score, latent] = pca(rt_prot_dev);
 over300 = sum(rt_prot_dev)>300; % 10
@@ -359,14 +371,18 @@ permuted = randperm(920);
 test = permuted(1:floor(920*test_frac)); 
 train = permuted(ceil((920*test_frac)):end);
 
-rt_prot_classify2 = fitcdiscr(score(train,over300),train_response(train),'DiscrimType','pseudoQuadratic');
+rt_prot_classify2 = fitcdiscr(score(train,over300),train_response(train),'DiscrimType','pseudoquadratic');
 
 rt_prot_predict2 = predict(rt_prot_classify2,score(test,over300));
 
 cv_quad = horzcat(rt_prot_predict2, train_response(test));
 cv_acc_quad(i)= mean(cv_quad(:,1) == cv_quad(:,2));
 end
-
-rt_prot_cv_acc_quad = mean(cv_acc_quad) 
+rt_prot_cv_acc_quad = mean(cv_acc_quad);
+cv_0_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==0))/sum(cv_quad(:,2)==0);
+cv_1_acc=sum((cv_quad(:,1)==cv_quad(:,2)&cv_quad(:,2)==1))/sum(cv_quad(:,2)==1);
+[rt_prot_cv_acc_quad,cv_0_acc,cv_1_acc]
 % 0.3149 when all scores used
 % 0.7874, 0.7832 when over300 10 scores used
+% 0.80 when diaglinear
+% 3/34 = 0.0882 accuracy of guessing 1's
